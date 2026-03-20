@@ -3,17 +3,18 @@ import { User, Bell, Search, LogOut, Settings } from 'lucide-react';
 
 interface HeaderProps {
   title: string;
+  section: string;
 }
 
-export const Header: React.FC<HeaderProps> = ({ title }) => {
+export const Header: React.FC<HeaderProps> = ({ title, section }) => {
   return (
-    <header className="h-20 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-30 shadow-sm">
+    <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
       <div className="flex items-center gap-4">
         <div className="w-1 h-6 bg-primary rounded-full" />
         <div className="flex flex-col">
           <h2 className="text-xl font-black text-slate-900 tracking-tight leading-none">{title}</h2>
           <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5">
-            <span>生产系统</span>
+            <span>{section}</span>
             <span className="text-slate-300">/</span>
             <span className="text-primary">{title}</span>
           </div>

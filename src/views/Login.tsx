@@ -64,14 +64,14 @@ export const LoginView: React.FC<LoginProps> = ({ onLogin }) => {
 
         {/* Digital Grid */}
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-900/10 to-blue-900/40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/10 to-primary/40" />
         
         {/* Flowing Data Lines */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {[...Array(5)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent w-full"
+              className="absolute h-[1px] bg-gradient-to-r from-transparent via-primary/50 to-transparent w-full"
               style={{ top: `${20 * (i + 1)}%` }}
               animate={{ x: ['-100%', '100%'] }}
               transition={{ duration: 8 + i * 2, repeat: Infinity, ease: "linear", delay: i }}
@@ -83,7 +83,7 @@ export const LoginView: React.FC<LoginProps> = ({ onLogin }) => {
         {[...Array(30)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 bg-blue-400/30 rounded-full"
+            className="absolute w-1 h-1 bg-primary/30 rounded-full"
             initial={{ 
               x: Math.random() * 100 + "%", 
               y: Math.random() * 100 + "%",
@@ -111,13 +111,13 @@ export const LoginView: React.FC<LoginProps> = ({ onLogin }) => {
         className="w-full max-w-[440px] relative z-10"
       >
         {/* Glassmorphism Container */}
-        <div className="bg-white/5 backdrop-blur-3xl rounded-[2.5rem] border border-white/10 shadow-[0_0_80px_rgba(59,130,246,0.12)] overflow-hidden relative group">
+        <div className="bg-white/5 backdrop-blur-3xl rounded-[2.5rem] border border-white/10 shadow-[0_0_80px_rgba(227,86,0,0.12)] overflow-hidden relative group">
           {/* Animated Border Glow */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#E35600]/10 via-transparent to-secondary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 pointer-events-none" />
           
           {/* Header Section */}
           <div className="p-10 text-center relative">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-[2px] bg-gradient-to-r from-transparent via-blue-500 to-transparent" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-[2px] bg-gradient-to-r from-transparent via-[#E35600] to-transparent" />
             
             <motion.div 
               animate={{ 
@@ -125,19 +125,19 @@ export const LoginView: React.FC<LoginProps> = ({ onLogin }) => {
                 rotate: [0, 5, -5, 0]
               }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="w-24 h-24 bg-blue-600/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-blue-500/20 relative group/icon"
+              className="w-24 h-24 bg-[#E35600]/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-[#E35600]/20 relative group/icon"
             >
               <motion.div
                 whileHover={{ scale: 1.2, rotate: 180 }}
                 className="relative z-10"
               >
-                <Droplets className="text-blue-400" size={44} />
+                <Droplets className="text-[#E35600]" size={44} />
               </motion.div>
-              <div className="absolute inset-0 rounded-full border-2 border-blue-400/10 animate-[ping_3s_linear_infinite]" />
-              <div className="absolute inset-2 rounded-full border border-blue-400/5 animate-[ping_4s_linear_infinite_1s]" />
+              <div className="absolute inset-0 rounded-full border-2 border-[#E35600]/10 animate-[ping_3s_linear_infinite]" />
+              <div className="absolute inset-2 rounded-full border border-[#E35600]/5 animate-[ping_4s_linear_infinite_1s]" />
               
               {/* Liquid Fill Effect Mockup */}
-              <div className="absolute bottom-0 left-0 w-full h-1/3 bg-blue-500/5 rounded-b-full blur-xl" />
+              <div className="absolute bottom-0 left-0 w-full h-1/3 bg-[#E35600]/5 rounded-b-full blur-xl" />
             </motion.div>
             
             <div className="mb-8">
@@ -147,21 +147,18 @@ export const LoginView: React.FC<LoginProps> = ({ onLogin }) => {
                 transition={{ duration: 1 }}
                 className="text-3xl font-black text-white tracking-tight mb-2"
               >
-                智水科技 <span className="text-blue-500">SMART WATER</span>
+                乐源智慧水务
               </motion.h1>
               <div className="flex items-center justify-center gap-3">
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: 32 }}
-                  className="h-[1px] bg-gradient-to-r from-transparent to-blue-500/50" 
+                  className="h-[1px] bg-gradient-to-r from-transparent to-[#E35600]/50" 
                 />
-                <p className="text-blue-200/40 text-[11px] font-mono uppercase tracking-[0.4em]">
-                  自来水厂生产管理系统
-                </p>
                 <motion.div 
                   initial={{ width: 0 }}
                   animate={{ width: 32 }}
-                  className="h-[1px] bg-gradient-to-l from-transparent to-blue-500/50" 
+                  className="h-[1px] bg-gradient-to-l from-transparent to-[#E35600]/50" 
                 />
               </div>
             </div>
@@ -175,21 +172,21 @@ export const LoginView: React.FC<LoginProps> = ({ onLogin }) => {
                 className="group"
               >
                 <div className="flex items-center justify-between mb-2.5 px-1">
-                  <label className="text-[11px] font-bold text-blue-400/70 tracking-widest flex items-center gap-2">
+                  <label className="text-[11px] font-bold text-primary/70 tracking-widest flex items-center gap-2">
                     <Activity size={12} className="animate-pulse" />
                     账号 / USERNAME
                   </label>
-                  <Cpu size={12} className="text-blue-500/30" />
+                  <Cpu size={12} className="text-primary/30" />
                 </div>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400/30 group-focus-within:text-blue-400 transition-colors" size={20} />
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/30 group-focus-within:text-primary transition-colors" size={20} />
                   <input 
                     type="text" 
                     defaultValue="admin"
-                    className="w-full pl-12 pr-4 py-4.5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:bg-white/10 focus:border-blue-500/50 outline-none transition-all font-medium text-sm"
+                    className="w-full pl-12 pr-4 py-4.5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:bg-white/10 focus:border-primary/50 outline-none transition-all font-medium text-sm"
                     placeholder="请输入登录账号"
                   />
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-blue-500 group-focus-within:w-full transition-all duration-500" />
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-primary group-focus-within:w-full transition-all duration-500" />
                 </div>
               </motion.div>
 
@@ -198,21 +195,21 @@ export const LoginView: React.FC<LoginProps> = ({ onLogin }) => {
                 className="group"
               >
                 <div className="flex items-center justify-between mb-2.5 px-1">
-                  <label className="text-[11px] font-bold text-blue-400/70 tracking-widest flex items-center gap-2">
+                  <label className="text-[11px] font-bold text-primary/70 tracking-widest flex items-center gap-2">
                     <Shield size={12} />
                     密码 / PASSWORD
                   </label>
-                  <Lock size={12} className="text-blue-500/30" />
+                  <Lock size={12} className="text-primary/30" />
                 </div>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-400/30 group-focus-within:text-blue-400 transition-colors" size={20} />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-primary/30 group-focus-within:text-primary transition-colors" size={20} />
                   <input 
                     type="password" 
                     defaultValue="123456"
-                    className="w-full pl-12 pr-4 py-4.5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:bg-white/10 focus:border-blue-500/50 outline-none transition-all font-medium text-sm"
+                    className="w-full pl-12 pr-4 py-4.5 bg-white/5 border border-white/10 rounded-2xl text-white placeholder:text-white/20 focus:bg-white/10 focus:border-primary/50 outline-none transition-all font-medium text-sm"
                     placeholder="请输入登录密码"
                   />
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-blue-500 group-focus-within:w-full transition-all duration-500" />
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-primary group-focus-within:w-full transition-all duration-500" />
                 </div>
               </motion.div>
             </div>
@@ -220,15 +217,18 @@ export const LoginView: React.FC<LoginProps> = ({ onLogin }) => {
             <div className="flex items-center justify-between text-xs">
               <motion.label 
                 whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-2 text-blue-200/40 cursor-pointer hover:text-blue-200 transition-colors"
+                className="flex items-center gap-2.5 text-white cursor-pointer select-none"
               >
-                <input type="checkbox" className="rounded border-white/10 bg-white/5 text-blue-600 focus:ring-blue-500/50" />
-                记住当前终端
+                <input 
+                  type="checkbox" 
+                  className="rounded border-2 border-white/40 bg-white/10 text-primary w-4 h-4 accent-white focus:ring-2 focus:ring-white/30 focus:ring-offset-0" 
+                />
+                <span className="font-medium text-white/95 hover:text-white transition-colors">记住密码</span>
               </motion.label>
               <motion.a 
-                whileHover={{ scale: 1.05, color: '#60a5fa' }}
+                whileHover={{ scale: 1.05, color: 'var(--primary-color)' }}
                 href="#" 
-                className="text-blue-400 transition-colors font-medium"
+                className="text-primary/80 transition-colors font-medium"
               >
                 忘记密码?
               </motion.a>
@@ -237,7 +237,7 @@ export const LoginView: React.FC<LoginProps> = ({ onLogin }) => {
             <button 
               type="submit"
               disabled={loading}
-              className="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl font-bold flex items-center justify-center gap-3 transition-all relative overflow-hidden group disabled:opacity-70 shadow-[0_10px_30px_-10px_rgba(37,99,235,0.5)]"
+              className="w-full py-5 bg-primary hover:bg-primary/90 text-white rounded-2xl font-bold flex items-center justify-center gap-3 transition-all relative overflow-hidden group disabled:opacity-70 shadow-[0_10px_30px_-10px_rgba(0,85,150,0.5)]"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
               {loading ? (
@@ -250,38 +250,6 @@ export const LoginView: React.FC<LoginProps> = ({ onLogin }) => {
               )}
             </button>
           </form>
-
-          {/* Footer Info */}
-          <div className="px-10 py-5 bg-white/5 border-t border-white/5 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full" />
-                <div className="absolute inset-0 bg-emerald-500 rounded-full animate-ping opacity-40" />
-              </div>
-              <span className="text-[10px] text-emerald-500/80 font-mono uppercase tracking-widest">系统运行正常</span>
-            </div>
-            <p className="text-[10px] text-white/20 font-mono tracking-tighter">© 智水科技 2024 | 工业级水务中枢</p>
-          </div>
-        </div>
-
-        {/* Bottom Decorative Text */}
-        <div className="mt-10 flex items-center justify-center gap-8 text-white/10">
-          {[
-            { icon: Shield, text: "安全加密" },
-            { icon: Globe, text: "全球节点" },
-            { icon: Waves, text: "水务逻辑" }
-          ].map((item, idx) => (
-            <motion.div 
-              key={idx}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1 + idx * 0.2 }}
-              className="flex items-center gap-2 group cursor-default"
-            >
-              <item.icon size={14} className="group-hover:text-blue-500/50 transition-colors" />
-              <span className="text-[10px] font-mono uppercase tracking-[0.2em] group-hover:text-white/30 transition-colors">{item.text}</span>
-            </motion.div>
-          ))}
         </div>
       </motion.div>
     </div>

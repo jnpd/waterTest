@@ -3,6 +3,7 @@ import { Settings, X, Check, Palette, Box } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 const primaryColors = [
+  { name: '默认主色', value: '#E35600' },
   { name: '默认蓝', value: '#2563eb' },
   { name: '极客蓝', value: '#1d4ed8' },
   { name: '酱紫', value: '#7c3aed' },
@@ -22,7 +23,7 @@ const radiusOptions = [
 
 export const ThemeSettings: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [primaryColor, setPrimaryColor] = useState('#2563eb');
+  const [primaryColor, setPrimaryColor] = useState('#E35600');
   const [borderRadius, setBorderRadius] = useState('1rem');
 
   useEffect(() => {
@@ -142,7 +143,7 @@ export const ThemeSettings: React.FC = () => {
               <div className="p-6 border-t border-slate-100 bg-slate-50/50">
                 <button 
                   onClick={() => {
-                    setPrimaryColor('#2563eb');
+                    setPrimaryColor('#E35600');
                     setBorderRadius('1rem');
                   }}
                   className="w-full py-3 bg-white border border-slate-200 text-slate-600 rounded-2xl text-sm font-bold hover:bg-slate-50 transition-all"

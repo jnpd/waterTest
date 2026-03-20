@@ -2,7 +2,8 @@
 @import "tailwindcss";
 
 :root {
-  --primary-color: #2563eb;
+  --primary-color: #005596;
+  --secondary-color: #F39200;
   --border-radius: 1rem;
   --sidebar-bg: #001529;
 }
@@ -12,6 +13,7 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   --radius-xl: var(--border-radius);
   --color-primary: var(--primary-color);
+  --color-secondary: var(--secondary-color);
 }
 
 @layer utilities {

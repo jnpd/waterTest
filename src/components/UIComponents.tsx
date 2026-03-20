@@ -44,7 +44,7 @@ export const TableHeader: React.FC<{
   onSort?: () => void;
 }> = ({ children, className = "", sortable, sortDirection, onSort }) => (
   <th 
-    className={`px-6 py-4 text-[11px] uppercase tracking-wider ${sortable ? 'cursor-pointer hover:bg-slate-100 transition-colors group/th' : ''} ${className}`}
+    className={`px-4 py-3 text-[11px] uppercase tracking-wider ${sortable ? 'cursor-pointer hover:bg-slate-100 transition-colors group/th' : ''} ${className}`}
     onClick={sortable ? onSort : undefined}
   >
     <div className="flex items-center gap-2">
@@ -135,7 +135,7 @@ export const TableRow: React.FC<{ children: React.ReactNode; className?: string;
 );
 
 export const TableCell: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = "" }) => (
-  <td className={`px-6 py-4 ${className}`}>
+  <td className={`px-4 py-3 ${className}`}>
     {children}
   </td>
 );
@@ -148,7 +148,7 @@ export const StatusBadge: React.FC<{ children: React.ReactNode; variant?: BadgeV
     success: 'bg-emerald-50 text-emerald-700 border-emerald-100',
     warning: 'bg-amber-50 text-amber-700 border-amber-100',
     error: 'bg-rose-50 text-rose-700 border-rose-100',
-    info: 'bg-blue-50 text-blue-700 border-blue-100',
+    info: 'bg-primary/10 text-primary border-primary/20',
     neutral: 'bg-slate-100 text-slate-600 border-slate-200',
   };
 
@@ -185,9 +185,9 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   };
 
   const sizes = {
-    sm: "px-3 py-1.5 text-xs rounded-lg",
-    md: "px-4 py-2.5 text-sm rounded-xl",
-    lg: "px-6 py-3 text-base rounded-2xl",
+    sm: "px-2.5 py-1.5 text-xs rounded-lg",
+    md: "px-3 py-2 text-sm rounded-xl",
+    lg: "px-5 py-2.5 text-base rounded-2xl",
   };
 
   return (
@@ -220,7 +220,7 @@ export const Modal: React.FC<ModalProps> = ({
     sm: 'max-w-md',
     md: 'max-w-lg',
     lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
+    xl: 'max-w-6xl',
   };
 
   return (
@@ -231,7 +231,6 @@ export const Modal: React.FC<ModalProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
             className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
           />
           <motion.div
@@ -252,7 +251,7 @@ export const Modal: React.FC<ModalProps> = ({
             </div>
 
             {/* Body */}
-            <div className="px-8 py-6 max-h-[70vh] overflow-y-auto">
+            <div className="px-8 py-6 max-h-[80vh] overflow-y-auto">
               {children}
             </div>
 

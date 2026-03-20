@@ -1,291 +1,374 @@
-import React, { useState } from 'react';
-import { 
-  Plus, 
-  FileUp, 
-  FileDown, 
-  Filter,
-  Edit2,
-  Trash2,
-  MoreHorizontal
-} from 'lucide-react';
-import { 
-  SearchInput, 
-  TableContainer, 
-  TableHead, 
-  TableHeader, 
-  TableRow, 
-  TableCell, 
-  StatusBadge, 
+import React, { useEffect, useMemo, useState } from 'react';
+import { Edit2, Filter, Plus, Trash2 } from 'lucide-react';
+import {
   ActionButton,
+  ColumnSettings,
   Modal,
-  ColumnSettings
+  SearchInput,
+  StatusBadge,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '../components/UIComponents';
+import { loadArchiveCatalog, saveArchiveCatalog } from '../utils/archiveStore';
+
+type SortKey = 'name' | 'model' | 'caliber' | 'remark' | 'createdAt';
+
+interface ArchiveRecord {
+  id: string;
+  name: string;
+  model: string;
+  caliber: string;
+  remark: string;
+  createdAt: string;
+}
+
+interface ArchiveFormState {
+  name: string;
+  model: string;
+  caliber: string;
+  remark: string;
+}
+
+const MODEL_OPTIONS = ['LXSG-15', 'LXSG-20', 'LXSG-25', 'WS-15A'];
+
+const initialRecords: ArchiveRecord[] = [
+  {
+    id: 'a1',
+    name: '户用远传水表（DN15）',
+    model: 'LXSG-15',
+    caliber: 'DN15',
+    remark: '',
+    createdAt: '2026-03-18 08:30:00',
+  },
+  {
+    id: 'a2',
+    name: '户用远传水表（DN20）',
+    model: 'LXSG-20',
+    caliber: 'DN20',
+    remark: '',
+    createdAt: '2026-03-18 09:15:00',
+  },
+  {
+    id: 'a3',
+    name: '大口径产测表（DN25）',
+    model: 'LXSG-25',
+    caliber: 'DN25',
+    remark: '',
+    createdAt: '2026-03-18 10:05:00',
+  },
+];
+
+const emptyForm: ArchiveFormState = {
+  name: '',
+  model: MODEL_OPTIONS[0],
+  caliber: 'DN15',
+  remark: '',
+};
+
+const getNowLabel = () => new Date().toLocaleString('zh-CN', { hour12: false });
 
 export const ArchiveView: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
-
-  // Column visibility state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [records, setRecords] = useState<ArchiveRecord[]>(() => loadArchiveCatalog(initialRecords));
+  const [keyword, setKeyword] = useState('');
+  const [form, setForm] = useState<ArchiveFormState>(emptyForm);
   const [columns, setColumns] = useState([
-    { id: 'model', label: '型号', visible: true },
-    { id: 'caliber', label: '口径', visible: true },
-    { id: 'protocol', label: '协议', visible: true },
-    { id: 'entryTime', label: '入库时间', visible: true },
-    { id: 'reportTime', label: '上报时间', visible: true },
-    { id: 'taskNo', label: '生产任务号', visible: true },
+    { id: 'name', label: '表具名称', visible: true },
+    { id: 'model', label: '表具型号', visible: true },
+    { id: 'caliber', label: '表具口径', visible: true },
     { id: 'remark', label: '备注', visible: true },
+    { id: 'createdAt', label: '创建时间', visible: true },
   ]);
-
-  const toggleColumn = (id: string) => {
-    setColumns(prev => prev.map(col => col.id === id ? { ...col, visible: !col.visible } : col));
-  };
-
-  // Sorting state
-  const [sortConfig, setSortConfig] = useState<{ key: string; direction: 'asc' | 'desc' | null }>({
-    key: '',
-    direction: null
+  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: 'asc' | 'desc' | null }>({
+    key: 'createdAt',
+    direction: 'desc',
   });
 
-  const handleSort = (key: string) => {
+  const toggleColumn = (id: string) => {
+    setColumns((prev) => prev.map((item) => (item.id === id ? { ...item, visible: !item.visible } : item)));
+  };
+
+  const isVisible = (id: string) => columns.find((item) => item.id === id)?.visible;
+
+  const handleSort = (key: SortKey) => {
     let direction: 'asc' | 'desc' | null = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    } else if (sortConfig.key === key && sortConfig.direction === 'desc') {
-      direction = null;
-    }
+    if (sortConfig.key === key && sortConfig.direction === 'asc') direction = 'desc';
+    if (sortConfig.key === key && sortConfig.direction === 'desc') direction = null;
     setSortConfig({ key, direction });
   };
 
-  const isVisible = (id: string) => columns.find(c => c.id === id)?.visible;
+  useEffect(() => {
+    saveArchiveCatalog(records);
+  }, [records]);
 
-  const handleAdd = () => {
-    setEditingItem(null);
+  const filteredRecords = useMemo(() => {
+    const normalized = keyword.trim().toLowerCase();
+    if (!normalized) return records;
+    return records.filter((item) =>
+      [
+        item.name,
+        item.model,
+        item.caliber,
+        item.remark,
+      ]
+        .join(' ')
+        .toLowerCase()
+        .includes(normalized)
+    );
+  }, [keyword, records]);
+
+  const sortedRecords = useMemo(() => {
+    if (!sortConfig.direction) return filteredRecords;
+    const next = [...filteredRecords];
+    next.sort((left, right) => {
+      const leftValue = left[sortConfig.key] || '';
+      const rightValue = right[sortConfig.key] || '';
+      const compared = String(leftValue).localeCompare(String(rightValue), 'zh-CN');
+      return sortConfig.direction === 'asc' ? compared : compared * -1;
+    });
+    return next;
+  }, [filteredRecords, sortConfig]);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingId(null);
+    setForm(emptyForm);
+  };
+
+  const openCreate = () => {
+    setEditingId(null);
+    setForm(emptyForm);
     setIsModalOpen(true);
   };
 
-  const handleEdit = (item: any) => {
-    setEditingItem(item);
+  const openEdit = (item: ArchiveRecord) => {
+    setEditingId(item.id);
+    setForm({
+      name: item.name,
+      model: item.model,
+      caliber: item.caliber,
+      remark: item.remark,
+    });
     setIsModalOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    setRecords((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const normalizeName = (value: string) => value.trim().toLowerCase();
+
+  const handleSave = () => {
+    const name = form.name.trim();
+    const model = form.model.trim();
+    const caliber = form.caliber.trim();
+    const remark = form.remark.trim();
+
+    if (!name) {
+      alert('请填写表具名称');
+      return;
+    }
+    if (!model) {
+      alert('请填写表具型号');
+      return;
+    }
+    if (!caliber) {
+      alert('请填写表具口径');
+      return;
+    }
+
+    const duplicated = records.some((item) => normalizeName(item.name) === normalizeName(name) && item.id !== editingId);
+    if (duplicated) {
+      alert('表具名称不可重复，请调整后再保存');
+      return;
+    }
+
+    if (editingId) {
+      setRecords((prev) =>
+        prev.map((item) =>
+          item.id === editingId
+            ? {
+                ...item,
+                name,
+                model,
+                caliber,
+                remark,
+              }
+            : item
+        )
+      );
+    } else {
+      setRecords((prev) => [
+        {
+          id: Date.now().toString(),
+          name,
+          model,
+          caliber,
+          remark,
+          createdAt: getNowLabel(),
+        },
+        ...prev,
+      ]);
+    }
+
+    closeModal();
   };
 
   return (
-    <div className="p-6 space-y-6 bg-slate-50/50 min-h-full">
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          { label: '设备总数', value: '12,482', sub: '较上月 +12%', color: 'text-primary', bg: 'bg-primary/5' },
-          { label: 'LXSG-20 型号', value: '8,231', sub: '占比 65.9%', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-          { label: 'NB-IoT 协议', value: '11,024', sub: '占比 88.3%', color: 'text-violet-600', bg: 'bg-violet-50' },
-        ].map((stat) => (
-          <div key={stat.label} className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-all">
-            <div className={`absolute top-0 right-0 w-24 h-24 ${stat.bg} rounded-full -mr-12 -mt-12 opacity-50 blur-2xl group-hover:scale-150 transition-transform duration-700`} />
-            <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest relative z-10">{stat.label}</p>
-            <div className="mt-4 flex items-baseline gap-3 relative z-10">
-              <span className="text-3xl font-black text-slate-900 tracking-tight">{stat.value}</span>
-              <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${stat.color} ${stat.bg}`}>{stat.sub}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Toolbar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3 flex-1 min-w-[300px]">
-          <SearchInput placeholder="搜索表号、IMEI、生产任务号..." />
-          <ActionButton variant="outline" icon={Filter}>筛选</ActionButton>
+    <div className="p-4 space-y-4 bg-slate-50/50 min-h-full">
+      <div className="bg-white p-3 rounded-xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3 flex-1 min-w-[320px]">
+          <SearchInput
+            value={keyword}
+            onChange={(event) => setKeyword(event.target.value)}
+            placeholder="搜索表具名称、型号、口径或备注..."
+          />
         </div>
         <div className="flex items-center gap-2">
           <ColumnSettings columns={columns} onToggle={toggleColumn} />
-          <ActionButton icon={Plus} onClick={handleAdd}>新增档案</ActionButton>
-          <div className="w-px h-6 bg-slate-200 mx-1" />
-          <ActionButton variant="outline" icon={FileUp} size="sm">导入</ActionButton>
-          <ActionButton variant="outline" icon={FileDown} size="sm">导出</ActionButton>
+          <ActionButton icon={Plus} onClick={openCreate}>
+            新增档案
+          </ActionButton>
         </div>
       </div>
 
-      {/* Table */}
       <TableContainer>
         <TableHead>
           <tr>
+            {isVisible('name') && (
+              <TableHeader sortable sortDirection={sortConfig.key === 'name' ? sortConfig.direction : null} onSort={() => handleSort('name')}>
+                表具名称
+              </TableHeader>
+            )}
             {isVisible('model') && (
-              <TableHeader 
-                sortable 
-                sortDirection={sortConfig.key === 'model' ? sortConfig.direction : null}
-                onSort={() => handleSort('model')}
-              >
-                型号
+              <TableHeader sortable sortDirection={sortConfig.key === 'model' ? sortConfig.direction : null} onSort={() => handleSort('model')}>
+                表具型号
               </TableHeader>
             )}
             {isVisible('caliber') && (
-              <TableHeader 
-                sortable 
-                sortDirection={sortConfig.key === 'caliber' ? sortConfig.direction : null}
-                onSort={() => handleSort('caliber')}
-              >
-                口径
-              </TableHeader>
-            )}
-            {isVisible('protocol') && (
-              <TableHeader 
-                sortable 
-                sortDirection={sortConfig.key === 'protocol' ? sortConfig.direction : null}
-                onSort={() => handleSort('protocol')}
-              >
-                协议
-              </TableHeader>
-            )}
-            {isVisible('entryTime') && (
-              <TableHeader 
-                sortable 
-                sortDirection={sortConfig.key === 'entryTime' ? sortConfig.direction : null}
-                onSort={() => handleSort('entryTime')}
-              >
-                入库时间
-              </TableHeader>
-            )}
-            {isVisible('reportTime') && (
-              <TableHeader 
-                sortable 
-                sortDirection={sortConfig.key === 'reportTime' ? sortConfig.direction : null}
-                onSort={() => handleSort('reportTime')}
-              >
-                上报时间
-              </TableHeader>
-            )}
-            {isVisible('taskNo') && (
-              <TableHeader 
-                sortable 
-                sortDirection={sortConfig.key === 'taskNo' ? sortConfig.direction : null}
-                onSort={() => handleSort('taskNo')}
-              >
-                生产任务号
+              <TableHeader sortable sortDirection={sortConfig.key === 'caliber' ? sortConfig.direction : null} onSort={() => handleSort('caliber')}>
+                表具口径
               </TableHeader>
             )}
             {isVisible('remark') && (
-              <TableHeader 
-                sortable 
-                sortDirection={sortConfig.key === 'remark' ? sortConfig.direction : null}
-                onSort={() => handleSort('remark')}
-              >
+              <TableHeader sortable sortDirection={sortConfig.key === 'remark' ? sortConfig.direction : null} onSort={() => handleSort('remark')}>
                 备注
+              </TableHeader>
+            )}
+            {isVisible('createdAt') && (
+              <TableHeader sortable sortDirection={sortConfig.key === 'createdAt' ? sortConfig.direction : null} onSort={() => handleSort('createdAt')}>
+                创建时间
               </TableHeader>
             )}
             <TableHeader className="text-right">操作</TableHeader>
           </tr>
         </TableHead>
         <tbody>
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => {
-            const item = {
-              id: i.toString(),
-              model: 'LXSG-20',
-              caliber: 'DN20',
-              protocol: 'NB-IoT CJ/T 188',
-              entryTime: `2024-03-17 10:24:3${i}`,
-              reportTime: `2024-03-17 11:00:0${i}`,
-              taskNo: 'TASK-20240317',
-              remark: '无'
-            };
-            return (
-              <TableRow key={i}>
-                {isVisible('model') && <TableCell className="text-slate-900 font-bold">{item.model}</TableCell>}
-                {isVisible('caliber') && <TableCell className="text-slate-600 font-medium">{item.caliber}</TableCell>}
-                {isVisible('protocol') && (
-                  <TableCell>
-                    <StatusBadge variant="info">{item.protocol}</StatusBadge>
-                  </TableCell>
-                )}
-                {isVisible('entryTime') && <TableCell className="text-slate-500 font-medium">{item.entryTime}</TableCell>}
-                {isVisible('reportTime') && <TableCell className="text-slate-500 font-medium">{item.reportTime}</TableCell>}
-                {isVisible('taskNo') && <TableCell className="text-slate-600 font-mono font-bold">{item.taskNo}</TableCell>}
-                {isVisible('remark') && <TableCell className="text-slate-400 text-xs">{item.remark}</TableCell>}
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-1 transition-opacity">
-                    <ActionButton variant="ghost" size="sm" icon={Edit2} onClick={() => handleEdit(item)} className="text-slate-400 hover:text-primary" />
-                    <ActionButton variant="ghost" size="sm" icon={Trash2} className="text-slate-400 hover:text-rose-600" />
-                    <ActionButton variant="ghost" size="sm" icon={MoreHorizontal} className="text-slate-400 hover:text-slate-900" />
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          })}
+          {sortedRecords.map((item) => (
+            <TableRow key={item.id}>
+              {isVisible('name') && <TableCell className="text-slate-900 font-bold">{item.name}</TableCell>}
+              {isVisible('model') && <TableCell className="font-mono text-slate-700 font-bold">{item.model}</TableCell>}
+              {isVisible('caliber') && <TableCell className="text-slate-700 font-medium">{item.caliber}</TableCell>}
+              {isVisible('remark') && <TableCell className="text-slate-500">{item.remark || '—'}</TableCell>}
+              {isVisible('createdAt') && <TableCell className="text-slate-500 text-xs whitespace-nowrap">{item.createdAt}</TableCell>}
+              <TableCell className="text-right">
+                <div className="flex items-center justify-end gap-1">
+                  <ActionButton variant="ghost" size="sm" icon={Edit2} onClick={() => openEdit(item)} />
+                  <ActionButton
+                    variant="ghost"
+                    size="sm"
+                    icon={Trash2}
+                    className="text-rose-400 hover:text-rose-600"
+                    onClick={() => handleDelete(item.id)}
+                  />
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
         </tbody>
       </TableContainer>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between px-2">
-        <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">显示 1 到 8 条，共 12,482 条记录</p>
-        <div className="flex gap-2">
-          <ActionButton variant="outline" size="sm" disabled>上一页</ActionButton>
-          <ActionButton size="sm">1</ActionButton>
-          <ActionButton variant="outline" size="sm">2</ActionButton>
-          <ActionButton variant="outline" size="sm">3</ActionButton>
-          <ActionButton variant="outline" size="sm">下一页</ActionButton>
+        <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">当前共 {sortedRecords.length} 条表具档案字段</p>
+        <div className="rounded-xl border border-primary/10 bg-primary/5 px-3 py-2 text-xs text-primary font-bold">
+          创建时间由系统自动生成，供仓库/测试/包装统一引用
         </div>
       </div>
 
-      {/* Add/Edit Modal */}
       <Modal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title={editingItem ? '编辑档案' : '新增档案'}
+        onClose={closeModal}
+        title={editingId ? '编辑表具档案' : '新增表具档案'}
         footer={
           <>
-            <ActionButton variant="outline" onClick={() => setIsModalOpen(false)}>取消</ActionButton>
-            <ActionButton onClick={() => setIsModalOpen(false)}>确定保存</ActionButton>
+            <ActionButton variant="outline" onClick={closeModal}>
+              取消
+            </ActionButton>
+            <ActionButton onClick={handleSave}>确定保存</ActionButton>
           </>
         }
       >
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">型号</label>
-              <input 
-                type="text" 
-                defaultValue={editingItem?.model}
-                placeholder="请输入型号"
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                表具名称 <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={form.name}
+                onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
+                placeholder="例如：户用远传水表（DN15）"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">口径</label>
-              <input 
-                type="text" 
-                defaultValue={editingItem?.caliber}
-                placeholder="请输入口径"
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">协议</label>
-              <select 
-                defaultValue={editingItem?.protocol}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
-              >
-                <option>NB-IoT CJ/T 188</option>
-                <option>LoRaWAN</option>
-                <option>M-Bus</option>
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">生产任务号</label>
-              <input 
-                type="text" 
-                defaultValue={editingItem?.taskNo}
-                placeholder="请输入生产任务号"
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all"
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                表具型号 <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={form.model}
+                onChange={(event) => setForm((prev) => ({ ...prev, model: event.target.value }))}
+                placeholder="例如：LXSG-15"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary"
               />
             </div>
           </div>
-          <div className="space-y-1.5">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest">备注</label>
-            <textarea 
-              defaultValue={editingItem?.remark}
-              placeholder="请输入备注"
-              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all resize-none"
-              rows={3}
-            />
+
+          <div className="grid sm:grid-cols-1 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">
+                表具口径 <span className="text-rose-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={form.caliber}
+                onChange={(event) => setForm((prev) => ({ ...prev, caliber: event.target.value }))}
+                placeholder="例如：DN15"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary"
+              />
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-1 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">备注</label>
+              <textarea
+                value={form.remark}
+                onChange={(event) => setForm((prev) => ({ ...prev, remark: event.target.value }))}
+                placeholder="例如：适用于某项目版本/特性说明（可选）"
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary min-h-[44px] resize-y"
+              />
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-xs text-slate-500">
+            创建时间由系统自动生成，当前页面维护完成后将同步作为仓库、批量测试和包装页的基础字段口径。
           </div>
         </div>
       </Modal>

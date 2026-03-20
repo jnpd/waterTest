@@ -22,8 +22,8 @@ import {
 } from '../components/UIComponents';
 
 const mockEnterprises: Enterprise[] = [
-  { id: '1', name: '智慧水务有限公司', code: 'ENT-001', adminName: '张总', status: 'active', createdAt: '2024-01-01' },
-  { id: '2', name: '工业仪表制造厂', code: 'ENT-002', adminName: '李厂长', status: 'active', createdAt: '2024-02-15' },
+  { id: '1', name: '智慧水务有限公司', code: 'ENT-001', adminName: '张总', adminUsername: 'admin_zhsw', adminPassword: '••••••', status: 'active', createdAt: '2024-01-01' },
+  { id: '2', name: '工业仪表制造厂', code: 'ENT-002', adminName: '李厂长', adminUsername: 'admin_gyyb', adminPassword: '••••••', status: 'active', createdAt: '2024-02-15' },
 ];
 
 const mockUsers: UserAccount[] = [
@@ -62,20 +62,26 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({ initialTab = '
     setIsModalOpen(true);
   };
 
+  const tabMeta = {
+    enterprise: { label: '账户管理', itemLabel: '账户' },
+    user: { label: '人员管理', itemLabel: '人员' },
+    role: { label: '角色管理', itemLabel: '角色' },
+  } as const;
+
   const getModalTitle = () => {
     const action = editingItem ? '编辑' : '新增';
-    const type = activeTab === 'enterprise' ? '企业' : activeTab === 'user' ? '账号' : '角色';
+    const type = tabMeta[activeTab].itemLabel;
     return `${action}${type}`;
   };
 
   return (
-    <div className="p-6 space-y-6 bg-slate-50/50 min-h-full">
+    <div className="p-4 space-y-4 bg-slate-50/50 min-h-full">
       {/* Tabs */}
       {!hideTabs && (
         <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl w-fit border border-slate-200">
           {[
-            { id: 'enterprise', label: '企业管理', icon: Building2 },
-            { id: 'user', label: '子账号管理', icon: Users },
+            { id: 'enterprise', label: '账户管理', icon: Building2 },
+            { id: 'user', label: '人员管理', icon: Users },
             { id: 'role', label: '角色管理', icon: ShieldCheck },
           ].map((tab) => (
             <button
@@ -97,10 +103,10 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({ initialTab = '
       {/* Toolbar */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between gap-4">
         <SearchInput 
-          placeholder={`搜索${activeTab === 'enterprise' ? '企业' : activeTab === 'user' ? '账号' : '角色'}...`} 
+          placeholder={`搜索${tabMeta[activeTab].itemLabel}...`} 
         />
         <ActionButton icon={Plus} onClick={handleAdd}>
-          新增{activeTab === 'enterprise' ? '企业' : activeTab === 'user' ? '账号' : '角色'}
+          新增{tabMeta[activeTab].itemLabel}
         </ActionButton>
       </div>
 
@@ -112,7 +118,9 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({ initialTab = '
               <tr>
                 <TableHeader>企业名称</TableHeader>
                 <TableHeader>企业编码</TableHeader>
-                <TableHeader>管理员</TableHeader>
+                <TableHeader>管理员姓名</TableHeader>
+                <TableHeader>登录账号</TableHeader>
+                <TableHeader>初始密码</TableHeader>
                 <TableHeader>创建时间</TableHeader>
                 <TableHeader>状态</TableHeader>
                 <TableHeader className="text-right">操作</TableHeader>
@@ -124,6 +132,8 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({ initialTab = '
                   <TableCell className="font-black text-slate-900">{ent.name}</TableCell>
                   <TableCell className="font-mono text-slate-500 font-bold">{ent.code}</TableCell>
                   <TableCell className="text-slate-600 font-medium">{ent.adminName}</TableCell>
+                  <TableCell className="font-mono text-slate-700 font-medium">{ent.adminUsername ?? '—'}</TableCell>
+                  <TableCell className="font-mono text-slate-500">{ent.adminPassword ?? '—'}</TableCell>
                   <TableCell className="text-slate-500 font-medium">{ent.createdAt}</TableCell>
                   <TableCell>
                     <StatusBadge variant="success">正常</StatusBadge>
@@ -144,8 +154,9 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({ initialTab = '
           <>
             <TableHead>
               <tr>
-                <TableHeader>账号名称</TableHeader>
-                <TableHeader>真实姓名</TableHeader>
+                <TableHeader>登录账号</TableHeader>
+                <TableHeader>人员姓名</TableHeader>
+                <TableHeader>所属企业</TableHeader>
                 <TableHeader>所属角色</TableHeader>
                 <TableHeader>最后登录</TableHeader>
                 <TableHeader>状态</TableHeader>
@@ -157,6 +168,9 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({ initialTab = '
                 <TableRow key={user.id}>
                   <TableCell className="font-black text-slate-900">{user.username}</TableCell>
                   <TableCell className="text-slate-600 font-bold">{user.realName}</TableCell>
+                  <TableCell className="text-slate-600 font-medium">
+                    {mockEnterprises.find(e => e.id === user.enterpriseId)?.name || '-'}
+                  </TableCell>
                   <TableCell>
                     <StatusBadge variant="info">{user.role}</StatusBadge>
                   </TableCell>
@@ -180,9 +194,9 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({ initialTab = '
           <>
             <TableHead>
               <tr>
-                <TableHeader>角色名称</TableHeader>
-                <TableHeader>描述</TableHeader>
-                <TableHeader>权限范围</TableHeader>
+                <TableHeader>权限角色</TableHeader>
+                <TableHeader>说明</TableHeader>
+                <TableHeader>功能权限</TableHeader>
                 <TableHeader className="text-right">操作</TableHeader>
               </tr>
             </TableHead>
@@ -211,30 +225,6 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({ initialTab = '
         )}
       </TableContainer>
 
-      {/* Tenant Isolation Info */}
-      <div className="p-8 bg-primary text-white rounded-xl shadow-2xl shadow-primary/20 relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl group-hover:scale-150 transition-transform duration-1000" />
-        <div className="relative z-10 flex items-start gap-8">
-          <div className="p-5 bg-white/20 rounded-2xl backdrop-blur-md border border-white/20 shadow-xl">
-            <Globe size={40} className="animate-pulse" />
-          </div>
-          <div>
-            <h4 className="text-2xl font-black tracking-tight">租户级数据隔离已开启</h4>
-            <p className="text-sm text-white/80 mt-3 leading-relaxed font-medium max-w-3xl">
-              系统当前运行在多租户模式下。企业管理功能仅超级管理员可见，各企业账号登录后仅能访问所属企业范围内的表具档案、测试记录及仓库数据。
-              所有敏感操作均已记录审计日志。
-            </p>
-            <div className="mt-6 flex items-center gap-4">
-              <div className="px-3 py-1 bg-white/10 rounded-full border border-white/10 text-[10px] font-black uppercase tracking-widest">
-                Security Level: High
-              </div>
-              <div className="px-3 py-1 bg-white/10 rounded-full border border-white/10 text-[10px] font-black uppercase tracking-widest">
-                Encryption: AES-256
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Add/Edit Modal */}
       <Modal
@@ -280,6 +270,26 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({ initialTab = '
                   />
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">账号</label>
+                  <input 
+                    type="text" 
+                    defaultValue={editingItem?.adminUsername}
+                    placeholder="请输入企业管理员登录账号"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">密码</label>
+                  <input 
+                    type="password" 
+                    defaultValue=""
+                    placeholder={editingItem ? '不修改请留空' : '请输入初始密码'}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
+                  />
+                </div>
+              </div>
             </>
           )}
 
@@ -287,11 +297,11 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({ initialTab = '
             <>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">账号名称</label>
+                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">人员名称</label>
                   <input 
                     type="text" 
                     defaultValue={editingItem?.username}
-                    placeholder="请输入账号名称"
+                    placeholder="请输入人员名称"
                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
                   />
                 </div>
@@ -305,16 +315,30 @@ export const PermissionsView: React.FC<PermissionsViewProps> = ({ initialTab = '
                   />
                 </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">所属角色</label>
-                <select 
-                  defaultValue={editingItem?.role}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
-                >
-                  {mockRoles.map(role => (
-                    <option key={role.id} value={role.name}>{role.name}</option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">所属企业</label>
+                  <select 
+                    defaultValue={editingItem?.enterpriseId}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
+                  >
+                    <option value="">请选择所属企业</option>
+                    {mockEnterprises.map(ent => (
+                      <option key={ent.id} value={ent.id}>{ent.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest">所属角色</label>
+                  <select 
+                    defaultValue={editingItem?.role}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all"
+                  >
+                    {mockRoles.map(role => (
+                      <option key={role.id} value={role.name}>{role.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </>
           )}
