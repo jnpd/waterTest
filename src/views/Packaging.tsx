@@ -375,7 +375,7 @@ export const PackagingView: React.FC = () => {
             <Package size={22} />
           </div>
           <h3 className="text-lg font-black text-slate-900">包装管理</h3>
-          <StatusBadge variant="info">按字段清单最终核对版</StatusBadge>
+          {/* <StatusBadge variant="info">按字段清单最终核对版</StatusBadge> */}
         </div>
 
         <div className="flex flex-wrap items-center gap-3">

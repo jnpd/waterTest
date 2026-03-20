@@ -1485,7 +1485,7 @@ export const BatchTestingView: React.FC<BatchTestingViewProps> = ({ initialBatch
       <Modal
         isOpen={isStandardsOpen}
         onClose={() => setIsStandardsOpen(false)}
-        title="配置测试合格标准参数（含条件图片存档）"
+        title="配置测试合格标准参数"
         size="lg"
         footer={
           <>
@@ -1524,24 +1524,6 @@ export const BatchTestingView: React.FC<BatchTestingViewProps> = ({ initialBatch
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">主IP</label>
-              <input
-                value={draftStandards.mainIp}
-                onChange={(event) => setDraftStandards((prev) => ({ ...prev, mainIp: event.target.value }))}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary"
-              />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">副IP</label>
-              <input
-                value={draftStandards.backupIp}
-                onChange={(event) => setDraftStandards((prev) => ({ ...prev, backupIp: event.target.value }))}
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary"
-              />
-            </div>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="space-y-1.5">
               <label className="text-xs font-black text-slate-400 uppercase tracking-widest">表读数精度（小数点后位数）</label>
               <input
                 value={draftStandards.readingPrecision}
@@ -1559,7 +1541,7 @@ export const BatchTestingView: React.FC<BatchTestingViewProps> = ({ initialBatch
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 space-y-3">
+          {/* <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 space-y-3">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-black text-slate-800">条件图片存档</p>
@@ -1626,7 +1608,7 @@ export const BatchTestingView: React.FC<BatchTestingViewProps> = ({ initialBatch
                 ))}
               </div>
             )}
-          </div>
+          </div> */}
         </div>
       </Modal>
     </div>

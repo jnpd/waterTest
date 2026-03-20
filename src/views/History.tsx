@@ -740,9 +740,9 @@ export const HistoryView: React.FC = () => {
           </div>
           <div>
             <h3 className="text-xl font-black text-slate-900 tracking-tight">批量测试历史</h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            {/* <p className="text-xs text-slate-500 mt-0.5">
               测试历史以批次快照为主视图；检验台数据通过「配置检验台」自动匹配，必要时在详情中手动调整
-            </p>
+            </p> */}
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
